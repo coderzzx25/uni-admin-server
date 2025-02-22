@@ -9,10 +9,13 @@ import { UserModule } from './apps/user/user.module';
 import { MenuModule } from './apps/menu/menu.module';
 import { RoleModule } from './apps/role/role.module';
 import { PermissionModule } from './apps/permission/permission.module';
+import { ChatGateway } from './apps/chat/chat.gateway';
+import { ChatModule } from './apps/chat/chat.module';
+import redisModule from './libs/redis.config';
 
 @Module({
-  imports: [configModel, typeormModule, AuthModule, UserModule, MenuModule, RoleModule, PermissionModule],
+  imports: [configModel, typeormModule, AuthModule, UserModule, MenuModule, RoleModule, PermissionModule, ChatModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ChatGateway, redisModule],
 })
 export class AppModule {}
