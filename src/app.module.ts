@@ -11,10 +11,21 @@ import { RoleModule } from './apps/role/role.module';
 import { PermissionModule } from './apps/permission/permission.module';
 import { ChatGateway } from './apps/chat/chat.gateway';
 import { ChatModule } from './apps/chat/chat.module';
+import { JobModule } from './apps/job/job.module';
 import redisModule from './libs/redis.config';
 
 @Module({
-  imports: [configModel, typeormModule, AuthModule, UserModule, MenuModule, RoleModule, PermissionModule, ChatModule],
+  imports: [
+    configModel,
+    typeormModule,
+    AuthModule,
+    UserModule,
+    MenuModule,
+    RoleModule,
+    PermissionModule,
+    ChatModule,
+    JobModule,
+  ],
   controllers: [AppController],
   providers: [AppService, ChatGateway, redisModule],
 })

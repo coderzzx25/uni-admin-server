@@ -20,5 +20,6 @@ import { PermissionModule } from '../permission/permission.module';
   ],
   controllers: [AuthController],
   providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}
