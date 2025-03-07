@@ -20,3 +20,26 @@ export const initializeTree = <T>(resource: T[], id: string, parentId: string, c
     return father[parentId] === 0 || !tempObj[father[parentId]];
   });
 };
+
+/**
+ * 获取当前时间戳
+ * @returns 时间戳
+ */
+export const getTimestamp = () => {
+  return Math.floor(Date.now() / 1000);
+};
+
+/**
+ * 时间戳转日期
+ * @param timestamp 时间戳
+ * @returns 日期 YYYY-MM-DD hh:mm
+ */
+export const timestampToDate = (timestamp: number) => {
+  const date = new Date(timestamp * 1000);
+  const Y = date.getFullYear();
+  const M = date.getMonth() + 1;
+  const D = date.getDate();
+  const h = date.getHours();
+  const m = date.getMinutes();
+  return `${Y}-${M}-${D} ${h}:${m}`;
+};
