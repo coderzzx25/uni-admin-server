@@ -11,7 +11,7 @@ import { RoleModule } from './apps/role/role.module';
 import { PermissionModule } from './apps/permission/permission.module';
 import { ChatGateway } from './apps/chat/chat.gateway';
 import { ChatModule } from './apps/chat/chat.module';
-import { JobModule } from './apps/job/job.module';
+import { PositionModule } from './apps/position/position.module';
 import redisModule from './libs/redis.config';
 
 @Module({
@@ -24,7 +24,7 @@ import redisModule from './libs/redis.config';
     RoleModule,
     PermissionModule,
     ChatModule,
-    JobModule,
+    PositionModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatGateway, redisModule],

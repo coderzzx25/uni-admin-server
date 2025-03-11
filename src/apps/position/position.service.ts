@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Jobs } from 'src/entities/jobs.entity';
+import { Positions } from 'src/entities/positions.entity';
+import { getTimestamp } from 'src/utils';
 import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
 export class JobService {
-  constructor(@InjectRepository(Jobs) private readonly jobsRepository: Repository<Jobs>) {}
+  constructor(@InjectRepository(Positions) private readonly jobsRepository: Repository<Positions>) {}
 
   /**
    * 获取职位列表
@@ -16,11 +17,11 @@ export class JobService {
    * @returns 职位列表
    */
   async getJobList(
-    where: FindOptionsWhere<Jobs>,
-    fields: FindManyOptions<Jobs>['select'],
+    where: FindOptionsWhere<Positions>,
+    fields: FindManyOptions<Positions>['select'],
     page = 1,
     size = 10,
-  ): Promise<{ list: Jobs[]; total: number }> {
+  ): Promise<{ list: Positions[]; total: number }> {
     const skip = (page - 1) * size;
     const [list, total] = await this.jobsRepository.findAndCount({
       where,
@@ -32,5 +33,16 @@ export class JobService {
       list,
       total,
     };
+  }
+
+  /**
+   * 编辑职位
+   * @param id 职位id
+   * @param data 职位数据
+   */
+  async updateJob(id: number, data: { name?: string; status?: number }) {
+    const updateTime = getTimestamp();
+    const result = await this.jobsRepository.update(id, { ...data, updateTime });
+    return result;
   }
 }

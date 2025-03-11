@@ -1,7 +1,21 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity('jobs')
-export class Jobs extends BaseEntity {
+export interface IJobItem {
+  id: number;
+  name: string;
+  createTime: string;
+  updateTime: string;
+  status: number;
+}
+
+export interface IEditJob {
+  id: number;
+  name?: string;
+  status?: number;
+}
+
+@Entity('positions')
+export class Positions extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
