@@ -1,12 +1,12 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
-import { JobService } from './position.service';
+import { PositionsService } from './position.service';
 import { IEditJob, IJobItem, Positions } from 'src/entities/positions.entity';
 import { AuthGuard } from '../auth/auth.guard';
 import { timestampToDate } from 'src/utils';
 
 @Controller('position')
 export class PositionController {
-  constructor(private readonly jobService: JobService) {}
+  constructor(private readonly positionsService: PositionsService) {}
 
   /**
    * 获取职位列表
@@ -18,7 +18,7 @@ export class PositionController {
    */
   @UseGuards(AuthGuard)
   @Get('list')
-  async getJobList(
+  async getPositionList(
     @Query('page') page: number,
     @Query('size') size: number,
     @Query('name') name?: string,
@@ -28,7 +28,7 @@ export class PositionController {
       throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
     }
     const where = { name, status };
-    const result = await this.jobService.getJobList(where, [], page, size);
+    const result = await this.positionsService.getJobList(where, [], page, size);
     const { list, total } = result;
     // 时间处理
     const lists = list.map((item: Positions) => ({
@@ -47,7 +47,10 @@ export class PositionController {
    */
   @UseGuards(AuthGuard)
   @Post('edit')
-  async editJob(@Body() body: IEditJob) {
+  async editPosition(@Body() body: IEditJob) {
+    if (!body) {
+      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+    }
     const { id, name, status } = body;
     if (!id) {
       throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
@@ -56,10 +59,31 @@ export class PositionController {
       throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
     }
     try {
-      await this.jobService.updateJob(id, { name, status });
+      await this.positionsService.updateJob(id, { name, status });
       return '更新成功';
     } catch (error) {
       return new HttpException('更新失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * 创建职位
+   */
+  @UseGuards(AuthGuard)
+  @Post('create')
+  async createPosition(@Body() data: { name: string; status: number }) {
+    if (!data) {
+      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+    }
+    const { name, status } = data;
+    if (!name || status === undefined) {
+      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      await this.positionsService.createPosition({ name, status });
+      return '创建成功';
+    } catch (error) {
+      return new HttpException('创建失败', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

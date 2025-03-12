@@ -5,8 +5,8 @@ import { getTimestamp } from 'src/utils';
 import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
-export class JobService {
-  constructor(@InjectRepository(Positions) private readonly jobsRepository: Repository<Positions>) {}
+export class PositionsService {
+  constructor(@InjectRepository(Positions) private readonly positionsRepository: Repository<Positions>) {}
 
   /**
    * 获取职位列表
@@ -23,7 +23,7 @@ export class JobService {
     size = 10,
   ): Promise<{ list: Positions[]; total: number }> {
     const skip = (page - 1) * size;
-    const [list, total] = await this.jobsRepository.findAndCount({
+    const [list, total] = await this.positionsRepository.findAndCount({
       where,
       select: fields,
       skip,
@@ -42,7 +42,17 @@ export class JobService {
    */
   async updateJob(id: number, data: { name?: string; status?: number }) {
     const updateTime = getTimestamp();
-    const result = await this.jobsRepository.update(id, { ...data, updateTime });
+    const result = await this.positionsRepository.update(id, { ...data, updateTime });
     return result;
+  }
+
+  /**
+   * 创建职位
+   */
+  async createPosition(data: { name: string; status: number }) {
+    const { name, status } = data;
+    const createTime = getTimestamp();
+    const updateTime = createTime;
+    return await this.positionsRepository.save({ name, status, createTime, updateTime });
   }
 }
