@@ -17,9 +17,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh """
-                        docker build -t $DOCKER_IMAGE .
-                    """
+                    // 使用 Docker Pipeline 插件构建镜像
+                    docker.build("$DOCKER_IMAGE")
                 }
             }
         }
@@ -27,11 +26,15 @@ pipeline {
         stage('Deploy with Docker') {
             steps {
                 script {
+                    // 停止并删除现有容器（如果存在）
                     sh """
                         docker stop $DOCKER_CONTAINER || true
                         docker rm $DOCKER_CONTAINER || true
-                        docker run -d --restart=always --name $DOCKER_CONTAINER -p $APP_PORT:$APP_PORT $DOCKER_IMAGE
                     """
+                    // 使用 Docker Pipeline 插件运行容器
+                    docker.image("$DOCKER_IMAGE").run(
+                        "--name $DOCKER_CONTAINER -d --restart=always -p $APP_PORT:$APP_PORT"
+                    )
                 }
             }
         }
