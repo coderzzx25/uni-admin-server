@@ -29,20 +29,11 @@ pipeline {
             }
         }
 
-        stage('Create Network') {
-            steps {
-                sh '''
-                    docker network inspect $NETWORK_NAME >/dev/null 2>&1 || docker network create $NETWORK_NAME
-                '''
-            }
-        }
-
         stage('Run New Container') {
             steps {
                 withEnv([
                     "IMAGE_NAME=$IMAGE_NAME",
-                    "CONTAINER_NAME=$CONTAINER_NAME",
-                    "NETWORK_NAME=$NETWORK_NAME"
+                    "CONTAINER_NAME=$CONTAINER_NAME"
                 ]) {
                     sh 'docker-compose up -d --build'
                 }
