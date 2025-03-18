@@ -31,7 +31,13 @@ pipeline {
 
         stage('Run New Container') {
             steps {
-                sh 'docker-compose up -d --build'
+                withEnv([
+                    "IMAGE_NAME=${IMAGE_NAME}",
+                    "CONTAINER_NAME=${CONTAINER_NAME}",
+                    "NETWORK_NAME=${NETWORK_NAME}"
+                ]) {
+                    sh 'docker-compose up -d --build'
+                }
             }
         }
     }
