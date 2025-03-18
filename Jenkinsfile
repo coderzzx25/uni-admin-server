@@ -31,12 +31,7 @@ pipeline {
 
         stage('Run New Container') {
             steps {
-                sh '''
-                    docker run -d --name $CONTAINER_NAME -p 3000:3000 \
-                      --restart=always \
-                      --network $NETWORK_NAME \
-                      $IMAGE_NAME
-                '''
+                sh 'docker-compose up -d --build'
             }
         }
     }

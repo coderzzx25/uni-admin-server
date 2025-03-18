@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  umi-admin-server:
+    build:
+      context: .
+    image: $IMAGE_NAME
+    container_name: $CONTAINER_NAME
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    restart: always
+    networks:
+      - $NETWORK_NAME
+
+networks:
+  $NETWORK_NAME:
+    external: true
