@@ -21,36 +21,26 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    // 使用 Docker Pipeline 插件构建镜像
-                    docker.build("$IMAGE_NAME")
-                }
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
         stage('Stop Old Container') {
             steps {
-                script {
-                    // 停止并删除旧容器
-                    try {
-                        docker.stop("$CONTAINER_NAME")
-                        docker.remove("$CONTAINER_NAME")
-                    } catch (Exception e) {
-                        echo "旧容器不存在或删除失败: ${e}"
-                    }
-                }
+                sh '''
+                    docker stop $CONTAINER_NAME || true
+                    docker rm $CONTAINER_NAME || true
+                '''
             }
         }
 
         stage('Run New Container') {
             steps {
-                script {
-                    // 使用 Docker Pipeline 插件运行新容器
-                    docker.run(
-                        "$IMAGE_NAME",
-                        "--name $CONTAINER_NAME -d -p 3000:3000 --restart=always"
-                    )
-                }
+                sh '''
+                    docker run -d --name $CONTAINER_NAME -p 3000:3000 \
+                      --restart=always \
+                      $IMAGE_NAME
+                '''
             }
         }
     }
