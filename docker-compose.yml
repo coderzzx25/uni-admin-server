@@ -4,16 +4,16 @@ services:
   umi-admin-server:
     build:
       context: .
-    image: $IMAGE_NAME
-    container_name: $CONTAINER_NAME
+    image: "${IMAGE_NAME}"  # 使用环境变量
+    container_name: "${CONTAINER_NAME}"  # 使用环境变量
     environment:
       - NODE_ENV=production
     ports:
       - "3000:3000"
     restart: always
     networks:
-      - $NETWORK_NAME
+      - "${NETWORK_NAME}"  # 使用环境变量
 
 networks:
-  $NETWORK_NAME:
+  ${NETWORK_NAME}:
     external: true
