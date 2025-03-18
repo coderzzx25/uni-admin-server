@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'umi-admin-server-image'
         CONTAINER_NAME = 'umi-admin-server-container'
+        NETWORK_NAME = 'coderzzx_network'
     }
 
     stages {
@@ -39,6 +40,7 @@ pipeline {
                 sh '''
                     docker run -d --name $CONTAINER_NAME -p 3000:3000 \
                       --restart=always \
+                      --network $NETWORK_NAME \
                       $IMAGE_NAME
                 '''
             }
