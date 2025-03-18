@@ -7,6 +7,12 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                deleteDir() // 清理 Jenkins 工作空间
+            }
+        }
+
         stage('Clone Repository') {
             steps {
                 git 'https://github.com/coderzzx25/uni-admin-server.git'
