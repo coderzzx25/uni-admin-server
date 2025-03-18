@@ -15,7 +15,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/coderzzx25/uni-admin-server.git'
+                git branch: 'main', url: 'https://github.com/coderzzx25/uni-admin-server.git'
             }
         }
 
