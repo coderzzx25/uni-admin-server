@@ -4,7 +4,9 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-COPY .env .env.production
+COPY .env .
+
+RUN cp .env .env.production
 
 RUN npm install
 
