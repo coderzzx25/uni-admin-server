@@ -4,11 +4,11 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
+COPY .env .env.production
+
 RUN npm install
 
 COPY . .
-
-COPY .env .env.production
 
 RUN npm run build
 
