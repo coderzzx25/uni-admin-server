@@ -2,42 +2,37 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'umi-admin-server-image'
-        DOCKER_CONTAINER = 'umi-admin-server-container'
-        APP_PORT = '3000'
-        REPO_URL = 'https://github.com/coderzzx25/uni-admin-server.git'
-        BRANCH = 'main'
+        IMAGE_NAME = 'umi-admin-server-image'
+        CONTAINER_NAME = 'umi-admin-server-container'
     }
 
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                git branch: env.BRANCH, url: env.REPO_URL
+                git 'https://github.com/coderzzx25/uni-admin-server.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh "docker build -t ${DOCKER_IMAGE}:latest ."
-                }
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
-        stage('Stop and Remove Existing Container') {
+        stage('Stop Old Container') {
             steps {
-                script {
-                    sh "docker stop ${DOCKER_CONTAINER} || true"
-                    sh "docker rm ${DOCKER_CONTAINER} || true"
-                }
+                sh 'docker stop $CONTAINER_NAME || true'
+                sh 'docker rm $CONTAINER_NAME || true'
             }
         }
 
-        stage('Deploy with Docker') {
+        stage('Run New Container') {
             steps {
-                script {
-                    sh "docker run -d --name ${DOCKER_CONTAINER} -p ${APP_PORT}:3000 ${DOCKER_IMAGE}:latest"
-                }
+                sh '''
+                docker run -d --name $CONTAINER_NAME -p 3000:3000 \
+                  --restart=always \
+                  $IMAGE_NAME
+                '''
             }
         }
     }
