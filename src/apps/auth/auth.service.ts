@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 import { Users } from 'src/entities/users.entity';
-import { ILoginResult, ISessionTypes, ILoginData } from './auth.interface';
+import { ILoginResult, ILoginData } from './auth.interface';
 import { UserService } from '../user/user.service';
 import { MenuService } from '../menu/menu.service';
 import { PermissionService } from '../permission/permission.service';
@@ -49,14 +49,8 @@ export class AuthService {
    * @returns 用户信息
    * @throws HttpException
    */
-  private async validateUser(loginData: ILoginData, session: ISessionTypes): Promise<HttpException | Users> {
-    const { username, password, verifyCode } = loginData;
-
-    // 验证码校验,开发环境不校验验证码
-    if (verifyCode !== session.verifyCode) {
-      return new HttpException('验证码错误', HttpStatus.BAD_REQUEST);
-    }
-
+  private async validateUser(loginData: ILoginData): Promise<HttpException | Users> {
+    const { username, password } = loginData;
     // 用户名密码校验
     if (!username && !password) {
       return new HttpException('用户名和密码不能为空', HttpStatus.BAD_REQUEST);
@@ -93,8 +87,8 @@ export class AuthService {
    * @returns 用户信息
    * @throws HttpException
    */
-  async loginSingTokenService(loginData: ILoginData, session: ISessionTypes): Promise<HttpException | ILoginResult> {
-    const authResult = await this.validateUser(loginData, session);
+  async loginSingTokenService(loginData: ILoginData): Promise<HttpException | ILoginResult> {
+    const authResult = await this.validateUser(loginData);
 
     if (authResult instanceof HttpException) {
       throw authResult;

@@ -1,9 +1,7 @@
-import { Body, Controller, Get, HttpException, Post, Res, Session, UseGuards, Req } from '@nestjs/common';
-import * as svgCaptcha from 'svg-captcha';
-import { Response } from 'express';
+import { Body, Controller, Get, HttpException, Post, UseGuards, Req } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { ISessionTypes, ILoginData, ILoginResult, ICanActivate } from './auth.interface';
+import { ILoginData, ILoginResult, ICanActivate } from './auth.interface';
 import { AuthGuard } from './auth.guard';
 import { Users } from 'src/entities/users.entity';
 import { Menus } from 'src/entities/menus.entity';
@@ -11,26 +9,6 @@ import { Menus } from 'src/entities/menus.entity';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-  /**
-   * 获取图片验证码
-   */
-  @Get('captcha')
-  async getCaptchaAPI(@Session() session: ISessionTypes, @Res() res: Response): Promise<void> {
-    // 生成验证码
-    const captcha = svgCaptcha.createMathExpr({
-      size: 4,
-      ignoreChars: '0oO1ilI',
-      noise: 2,
-      width: 132,
-      height: 40,
-      fontSize: 40,
-      color: true,
-      background: '#ffffff',
-    });
-    session.verifyCode = captcha.text; // 保存验证码到session
-    res.type('image/svg+xml'); // 返回的类型
-    res.send(captcha.data);
-  }
 
   /**
    * 账户密码登录
@@ -39,11 +17,8 @@ export class AuthController {
    * @returns 登录结果
    */
   @Post('account-login')
-  async accountLoginAPI(
-    @Body() loginData: ILoginData,
-    @Session() session: ISessionTypes,
-  ): Promise<HttpException | ILoginResult> {
-    const result = await this.authService.loginSingTokenService(loginData, session);
+  async accountLoginAPI(@Body() loginData: ILoginData): Promise<HttpException | ILoginResult> {
+    const result = await this.authService.loginSingTokenService(loginData);
     return result;
   }
 

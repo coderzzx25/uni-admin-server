@@ -20,12 +20,6 @@ export interface IUserAttributes {
   refreshToken?: string;
 }
 
-// session存储的数据类型
-export interface ISessionTypes {
-  verifyCode: string;
-  currentUserInfo: IUserAttributes;
-}
-
 // 账户登录信息
 export interface ILoginData {
   username: string; // 用户名
