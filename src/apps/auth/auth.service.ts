@@ -53,7 +53,7 @@ export class AuthService {
     const { username, password, verifyCode } = loginData;
 
     // 验证码校验,开发环境不校验验证码
-    if (verifyCode !== session.verifyCode && this.configService.get('ENV') !== 'development') {
+    if (verifyCode !== session.verifyCode) {
       return new HttpException('验证码错误', HttpStatus.BAD_REQUEST);
     }
 
