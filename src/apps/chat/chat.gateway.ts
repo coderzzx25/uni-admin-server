@@ -5,6 +5,9 @@ import { ChatService } from './chat.service';
 
 @WebSocketGateway({
   namespace: '/chat',
+  cors: {
+    origin: '*',
+  },
 })
 export class ChatGateway implements OnGatewayInit {
   @WebSocketServer() wss: Server;
