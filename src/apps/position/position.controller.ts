@@ -25,7 +25,7 @@ export class PositionController {
     @Query('status') status?: number,
   ): Promise<{ list: IJobItem[]; total: number } | HttpException> {
     if (!page || !size) {
-      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+      throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
     const where = { name, status };
     const result = await this.positionsService.getPositionList(where, [], page, size);
@@ -49,26 +49,26 @@ export class PositionController {
   @Post('edit')
   async editPosition(@Body() body: IEditJob) {
     if (!body) {
-      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+      throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
     const { id, name, status } = body;
     if (!id) {
-      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+      throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
     if (!name && status === undefined) {
-      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+      throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
     if (name) {
       const positionInfo = await this.positionsService.getPositionByName(name);
       if (positionInfo && positionInfo.id !== id) {
-        throw new HttpException('职位名称已存在', HttpStatus.BAD_REQUEST);
+        throw new HttpException('SYSTEM.POSITION.MODAL_CONFIG.FORM_CONFIG.ERROR_POSITION_NAME', HttpStatus.BAD_REQUEST);
       }
     }
     try {
       await this.positionsService.updatePosition(id, { name, status });
-      return '更新成功';
+      return 'SUCCESS_MESSAGE.UPDATE_SUCCESS';
     } catch (error) {
-      return new HttpException('更新失败', HttpStatus.INTERNAL_SERVER_ERROR);
+      return new HttpException('ERROR_MESSAGE.UPDATE_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -79,21 +79,21 @@ export class PositionController {
   @Post('create')
   async createPosition(@Body() data: { name: string; status: number }) {
     if (!data) {
-      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+      throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
     const { name, status } = data;
     if (!name || status === undefined) {
-      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+      throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
     const positionInfo = await this.positionsService.getPositionByName(name);
     if (positionInfo) {
-      throw new HttpException('职位名称已存在', HttpStatus.BAD_REQUEST);
+      throw new HttpException('SYSTEM.POSITION.MODAL_CONFIG.FORM_CONFIG.ERROR_POSITION_NAME', HttpStatus.BAD_REQUEST);
     }
     try {
       await this.positionsService.createPosition({ name, status });
-      return '创建成功';
+      return 'SUCCESS_MESSAGE.CREATE_SUCCESS';
     } catch (error) {
-      return new HttpException('创建失败', HttpStatus.INTERNAL_SERVER_ERROR);
+      return new HttpException('SUCCESS_MESSAGE.CREATE_SUCCESS', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
