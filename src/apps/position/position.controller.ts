@@ -28,7 +28,7 @@ export class PositionController {
       throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
     }
     const where = { name, status };
-    const result = await this.positionsService.getJobList(where, [], page, size);
+    const result = await this.positionsService.getPositionList(where, [], page, size);
     const { list, total } = result;
     // 时间处理
     const lists = list.map((item: Positions) => ({
@@ -58,8 +58,14 @@ export class PositionController {
     if (!name && status === undefined) {
       throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
     }
+    if (name) {
+      const positionInfo = await this.positionsService.getPositionByName(name);
+      if (positionInfo && positionInfo.id !== id) {
+        throw new HttpException('职位名称已存在', HttpStatus.BAD_REQUEST);
+      }
+    }
     try {
-      await this.positionsService.updateJob(id, { name, status });
+      await this.positionsService.updatePosition(id, { name, status });
       return '更新成功';
     } catch (error) {
       return new HttpException('更新失败', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -78,6 +84,10 @@ export class PositionController {
     const { name, status } = data;
     if (!name || status === undefined) {
       throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+    }
+    const positionInfo = await this.positionsService.getPositionByName(name);
+    if (positionInfo) {
+      throw new HttpException('职位名称已存在', HttpStatus.BAD_REQUEST);
     }
     try {
       await this.positionsService.createPosition({ name, status });

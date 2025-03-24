@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Positions } from 'src/entities/positions.entity';
 import { getTimestamp } from 'src/utils';
-import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsWhere, Not, Repository } from 'typeorm';
 
 @Injectable()
 export class PositionsService {
@@ -16,15 +16,22 @@ export class PositionsService {
    * @param size 每页数量
    * @returns 职位列表
    */
-  async getJobList(
+  async getPositionList(
     where: FindOptionsWhere<Positions>,
     fields: FindManyOptions<Positions>['select'],
     page = 1,
     size = 10,
   ): Promise<{ list: Positions[]; total: number }> {
     const skip = (page - 1) * size;
+    const newWhere = {
+      ...where,
+      id: Not(1),
+    };
     const [list, total] = await this.positionsRepository.findAndCount({
-      where,
+      where: newWhere,
+      order: {
+        id: 'DESC',
+      },
       select: fields,
       skip,
       take: size,
@@ -40,7 +47,7 @@ export class PositionsService {
    * @param id 职位id
    * @param data 职位数据
    */
-  async updateJob(id: number, data: { name?: string; status?: number }) {
+  async updatePosition(id: number, data: { name?: string; status?: number }) {
     const updateTime = getTimestamp();
     const result = await this.positionsRepository.update(id, { ...data, updateTime });
     return result;
@@ -54,5 +61,9 @@ export class PositionsService {
     const createTime = getTimestamp();
     const updateTime = createTime;
     return await this.positionsRepository.save({ name, status, createTime, updateTime });
+  }
+
+  async getPositionByName(name: string) {
+    return await this.positionsRepository.findOneBy({ name });
   }
 }
