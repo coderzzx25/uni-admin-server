@@ -1,3 +1,5 @@
+import { International } from 'src/entities/international.entity';
+
 /**
  * 将数组转换为树形结构
  * @param resource 数据源
@@ -19,6 +21,41 @@ export const initializeTree = <T>(resource: T[], id: string, parentId: string, c
     childArr.length && (father[children] = childArr);
     return father[parentId] === 0 || !tempObj[father[parentId]];
   });
+};
+
+interface ResourceItem<T = any> {
+  [key: string]: any;
+  children?: T[];
+}
+export const initializeLang = <T extends ResourceItem>(
+  resource: T[],
+  lang: string,
+  name = 'name',
+): Record<string, string> => {
+  const result = {};
+
+  for (let i = 0; i < resource.length; i++) {
+    const resourceItem = resource[i];
+
+    function recursive(item: T, key = '') {
+      let currentKey = key;
+
+      currentKey += currentKey ? `.${item[name]}` : item[name];
+
+      if (item[lang]) result[currentKey] = item[lang];
+
+      if (item.children?.length && Array.isArray(item.children)) {
+        for (let j = 0; j < item.children.length; j++) {
+          const child = item.children[j];
+          recursive(child, currentKey);
+        }
+      }
+    }
+
+    recursive(resourceItem);
+  }
+
+  return result;
 };
 
 /**

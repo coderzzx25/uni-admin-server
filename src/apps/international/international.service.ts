@@ -1,0 +1,76 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { International } from 'src/entities/international.entity';
+import { initializeLang, initializeTree, timestampToDate } from 'src/utils';
+import { FindManyOptions, FindOptionsWhere } from 'typeorm';
+
+interface ICreateInternational {
+  name: string;
+  founder: number;
+  createTime: number;
+  updateTime: number;
+  status: number;
+  enUS?: string;
+  zhCN?: string;
+  parentId?: number;
+}
+
+interface IUpdateInternational {
+  name: string;
+  founder?: number;
+  createTime?: number;
+  updateTime: number;
+  status: number;
+  enUS?: string;
+  zhCN?: string;
+  parentId?: number;
+}
+
+@Injectable()
+export class InternationalService {
+  constructor(@InjectRepository(International) private readonly internationalRepository: typeof International) {}
+
+  async getAllLocalsLang() {
+    const LANGS = ['zhCN', 'enUS']; // TODO:后续优化
+    const result = {};
+    const sqlData = await this.internationalRepository.find();
+
+    const treeLang = initializeTree(sqlData, 'id', 'parentId', 'children');
+
+    // 区分语言
+    for (let i = 0; i < LANGS.length; i++) {
+      const lang = LANGS[i];
+      result[lang] = initializeLang(treeLang, lang, 'name');
+    }
+
+    return result;
+  }
+
+  async getInternationalList(where: FindOptionsWhere<International>, fields: FindManyOptions<International>['select']) {
+    const data = await this.internationalRepository.find({
+      where,
+      select: fields,
+    });
+    const filterData = data.map((item) => ({
+      ...item,
+      parentId: item.parentId || undefined,
+      createTime: timestampToDate(item.createTime),
+      updateTime: timestampToDate(item.updateTime),
+    }));
+    const result = initializeTree(filterData, 'id', 'parentId', 'children');
+    return result;
+  }
+
+  async createInternational(data: ICreateInternational) {
+    const international = new International();
+    Object.assign(international, data);
+    const result = await this.internationalRepository.save(international);
+    return result;
+  }
+
+  async updateInternational(id: number, data: IUpdateInternational) {
+    const result = await this.internationalRepository.update(id, data);
+    return result;
+  }
+}

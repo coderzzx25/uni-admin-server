@@ -93,7 +93,7 @@ export class PositionController {
       await this.positionsService.createPosition({ name, status });
       return 'SUCCESS_MESSAGE.CREATE_SUCCESS';
     } catch (error) {
-      return new HttpException('SUCCESS_MESSAGE.CREATE_SUCCESS', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException('SUCCESS_MESSAGE.CREATE_SUCCESS', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

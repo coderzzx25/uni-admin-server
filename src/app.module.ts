@@ -12,6 +12,7 @@ import { PermissionModule } from './apps/permission/permission.module';
 import { ChatGateway } from './apps/chat/chat.gateway';
 import { ChatModule } from './apps/chat/chat.module';
 import { PositionModule } from './apps/position/position.module';
+import { InternationalModule } from './apps/international/international.module';
 import redisModule from './libs/redis.config';
 
 @Module({
@@ -25,6 +26,7 @@ import redisModule from './libs/redis.config';
     PermissionModule,
     ChatModule,
     PositionModule,
+    InternationalModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatGateway, redisModule],
