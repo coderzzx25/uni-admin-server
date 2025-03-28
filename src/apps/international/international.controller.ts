@@ -4,6 +4,7 @@ import { InternationalService } from './international.service';
 import { International } from 'src/entities/international.entity';
 import { ICanActivate } from '../auth/auth.interface';
 import { getTimestamp } from 'src/utils';
+import { Like } from 'typeorm';
 
 @Controller('international')
 export class InternationalController {
@@ -27,7 +28,10 @@ export class InternationalController {
   @UseGuards(AuthGuard)
   @Get('list')
   async getInternationalList(@Query('name') name?: string, @Query('status') status?: number) {
-    const where = { name, status };
+    const where = {
+      name: name ? Like(`%${name}%`) : undefined,
+      status,
+    };
 
     const result = await this.internationalService.getInternationalList(where, []);
 
