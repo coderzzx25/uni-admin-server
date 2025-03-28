@@ -26,8 +26,8 @@ export class InternationalController {
    */
   @UseGuards(AuthGuard)
   @Get('list')
-  async getInternationalList(@Query('name') name?: string) {
-    const where = { name };
+  async getInternationalList(@Query('name') name?: string, @Query('status') status?: number) {
+    const where = { name, status };
 
     const result = await this.internationalService.getInternationalList(where, []);
 
