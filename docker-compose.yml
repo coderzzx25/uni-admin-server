@@ -7,7 +7,7 @@ services:
     environment:
       - NODE_ENV=production
       - NEST_MYSQL_HOST=mysql
-      - NEST_REDIS_PORT=redis
+      - NEST_REDIS_HOST=redis
     ports:
       - "3000:3000"
     restart: always
