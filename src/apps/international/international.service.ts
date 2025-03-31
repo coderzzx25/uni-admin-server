@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FindManyOptions, FindOptionsWhere } from 'typeorm';
+import Redis from 'ioredis';
 
 import { International } from 'src/entities/international.entity';
 import { initializeLang, initializeTree, timestampToDate } from 'src/utils';
-import { FindManyOptions, FindOptionsWhere } from 'typeorm';
+import RedisKey from 'src/constants/redis.key';
 
 interface ICreateInternational {
   name: string;
@@ -29,11 +31,21 @@ interface IUpdateInternational {
 
 @Injectable()
 export class InternationalService {
-  constructor(@InjectRepository(International) private readonly internationalRepository: typeof International) {}
+  constructor(
+    @InjectRepository(International) private readonly internationalRepository: typeof International,
+    @Inject('REDIS_CLIENT') private readonly redis: Redis,
+  ) {}
 
   async getAllLocalsLang() {
     const LANGS = ['zhCN', 'enUS']; // TODO:后续优化
     const result = {};
+
+    const redisLocales = await this.redis.get(RedisKey.LOCALES);
+
+    if (redisLocales) {
+      return JSON.parse(redisLocales);
+    }
+
     const sqlData = await this.internationalRepository.find();
 
     const treeLang = initializeTree(sqlData, 'id', 'parentId', 'children');
@@ -43,6 +55,9 @@ export class InternationalService {
       const lang = LANGS[i];
       result[lang] = initializeLang(treeLang, lang, 'name');
     }
+
+    // 将数据缓存到redis中
+    await this.redis.set(RedisKey.LOCALES, JSON.stringify(result));
 
     return result;
   }
@@ -66,11 +81,15 @@ export class InternationalService {
     const international = new International();
     Object.assign(international, data);
     const result = await this.internationalRepository.save(international);
+    // 删除redis缓存
+    await this.redis.del(RedisKey.LOCALES);
     return result;
   }
 
   async updateInternational(id: number, data: IUpdateInternational) {
     const result = await this.internationalRepository.update(id, data);
+    // 删除redis缓存
+    await this.redis.del(RedisKey.LOCALES);
     return result;
   }
 }
