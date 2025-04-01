@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Positions } from 'src/entities/positions.entity';
 import { getTimestamp, initializeTree, timestampToDate } from 'src/utils';
-import { FindManyOptions, FindOptionsWhere, Not, Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsWhere, Not } from 'typeorm';
 
 @Injectable()
 export class PositionsService {
-  constructor(@InjectRepository(Positions) private readonly positionsRepository: Repository<Positions>) {}
+  constructor(@InjectRepository(Positions) private readonly positionsRepository: typeof Positions) {}
 
   /**
    * 获取职位列表
