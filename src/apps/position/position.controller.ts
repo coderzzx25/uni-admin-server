@@ -1,8 +1,7 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
 import { PositionsService } from './position.service';
-import { IEditJob, IJobItem, Positions } from 'src/entities/positions.entity';
+import { IEditJob } from 'src/entities/positions.entity';
 import { AuthGuard } from '../auth/auth.guard';
-import { timestampToDate } from 'src/utils';
 
 @Controller('position')
 export class PositionController {
@@ -18,25 +17,11 @@ export class PositionController {
    */
   @UseGuards(AuthGuard)
   @Get('list')
-  async getPositionList(
-    @Query('page') page: number,
-    @Query('size') size: number,
-    @Query('name') name?: string,
-    @Query('status') status?: number,
-  ): Promise<{ list: IJobItem[]; total: number } | HttpException> {
-    if (!page || !size) {
-      throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
-    }
+  async getPositionList(@Query('name') name?: string, @Query('status') status?: number) {
     const where = { name, status };
-    const result = await this.positionsService.getPositionList(where, [], page, size);
-    const { list, total } = result;
-    // 时间处理
-    const lists = list.map((item: Positions) => ({
-      ...item,
-      createTime: timestampToDate(item.createTime),
-      updateTime: timestampToDate(item.updateTime),
-    }));
-    return { list: lists, total };
+    const result = await this.positionsService.getPositionList(where, []);
+
+    return result;
   }
 
   /**
@@ -51,11 +36,11 @@ export class PositionController {
     if (!body) {
       throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
-    const { id, name, status } = body;
+    const { id, name, parentId, status } = body;
     if (!id) {
       throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
-    if (!name && status === undefined) {
+    if (!name && status === undefined && parentId === undefined) {
       throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
     if (name) {
@@ -65,7 +50,7 @@ export class PositionController {
       }
     }
     try {
-      await this.positionsService.updatePosition(id, { name, status });
+      await this.positionsService.updatePosition(id, { name, parentId, status });
       return 'SUCCESS_MESSAGE.UPDATE_SUCCESS';
     } catch (error) {
       return new HttpException('ERROR_MESSAGE.UPDATE_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -77,11 +62,11 @@ export class PositionController {
    */
   @UseGuards(AuthGuard)
   @Post('create')
-  async createPosition(@Body() data: { name: string; status: number }) {
+  async createPosition(@Body() data: { name: string; parentId: number; status: number }) {
     if (!data) {
       throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
-    const { name, status } = data;
+    const { name, status, parentId } = data;
     if (!name || status === undefined) {
       throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
@@ -90,7 +75,7 @@ export class PositionController {
       throw new HttpException('SYSTEM.POSITION.MODAL_CONFIG.FORM_CONFIG.ERROR_POSITION_NAME', HttpStatus.BAD_REQUEST);
     }
     try {
-      await this.positionsService.createPosition({ name, status });
+      await this.positionsService.createPosition({ name, status, parentId });
       return 'SUCCESS_MESSAGE.CREATE_SUCCESS';
     } catch (error) {
       throw new HttpException('SUCCESS_MESSAGE.CREATE_SUCCESS', HttpStatus.INTERNAL_SERVER_ERROR);

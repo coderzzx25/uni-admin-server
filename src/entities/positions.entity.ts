@@ -11,6 +11,7 @@ export interface IJobItem {
 export interface IEditJob {
   id: number;
   name?: string;
+  parentId?: number;
   status?: number;
 }
 
@@ -21,6 +22,9 @@ export class Positions extends BaseEntity {
 
   @Column('varchar', { name: 'name', comment: '职位名称', length: 20 })
   name: string;
+
+  @Column('int', { name: 'parent_id', comment: '上级ID' })
+  parentId: number;
 
   @Column('int', { name: 'create_time', comment: '创建时间', default: () => 'UNIX_TIMESTAMP()' })
   createTime: number;

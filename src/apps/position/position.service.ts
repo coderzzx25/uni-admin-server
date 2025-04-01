@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Positions } from 'src/entities/positions.entity';
-import { getTimestamp } from 'src/utils';
+import { getTimestamp, initializeTree, timestampToDate } from 'src/utils';
 import { FindManyOptions, FindOptionsWhere, Not, Repository } from 'typeorm';
 
 @Injectable()
@@ -16,30 +16,23 @@ export class PositionsService {
    * @param size 每页数量
    * @returns 职位列表
    */
-  async getPositionList(
-    where: FindOptionsWhere<Positions>,
-    fields: FindManyOptions<Positions>['select'],
-    page = 1,
-    size = 10,
-  ): Promise<{ list: Positions[]; total: number }> {
-    const skip = (page - 1) * size;
+  async getPositionList(where: FindOptionsWhere<Positions>, fields: FindManyOptions<Positions>['select']) {
     const newWhere = {
       ...where,
       id: Not(1),
     };
-    const [list, total] = await this.positionsRepository.findAndCount({
-      where: newWhere,
-      order: {
-        id: 'DESC',
-      },
-      select: fields,
-      skip,
-      take: size,
-    });
-    return {
-      list,
-      total,
-    };
+    const data = await this.positionsRepository.find({ where: newWhere, select: fields });
+
+    const filterData = data.map((item) => ({
+      ...item,
+      parentId: item.parentId || undefined,
+      createTime: timestampToDate(item.createTime),
+      updateTime: timestampToDate(item.updateTime),
+    }));
+
+    const result = initializeTree(filterData, 'id', 'parentId', 'children');
+
+    return result;
   }
 
   /**
@@ -47,7 +40,7 @@ export class PositionsService {
    * @param id 职位id
    * @param data 职位数据
    */
-  async updatePosition(id: number, data: { name?: string; status?: number }) {
+  async updatePosition(id: number, data: { name?: string; parentId?: number; status?: number }) {
     const updateTime = getTimestamp();
     const result = await this.positionsRepository.update(id, { ...data, updateTime });
     return result;
@@ -56,11 +49,11 @@ export class PositionsService {
   /**
    * 创建职位
    */
-  async createPosition(data: { name: string; status: number }) {
-    const { name, status } = data;
+  async createPosition(data: { name: string; status: number; parentId?: number }) {
+    const { name, status, parentId } = data;
     const createTime = getTimestamp();
     const updateTime = createTime;
-    return await this.positionsRepository.save({ name, status, createTime, updateTime });
+    return await this.positionsRepository.save({ name, parentId, status, createTime, updateTime });
   }
 
   async getPositionByName(name: string) {
