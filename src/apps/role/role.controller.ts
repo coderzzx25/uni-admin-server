@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, UseGuard
 import { RoleService } from './role.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { timestampToDate } from 'src/utils';
-import { Roles } from 'src/entities/roles.entity';
+import { ICreateRole, IEditRole, Roles } from 'src/entities/roles.entity';
 
 @Controller('role')
 export class RoleController {
@@ -23,14 +23,13 @@ export class RoleController {
     @Query('page') page: number,
     @Query('size') size: number,
     @Query('name') name?: string,
-    @Query('code') code?: string,
     @Query('status') status?: number,
   ) {
     if (!page || !size) {
       throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
     }
 
-    const where = { name, code, status };
+    const where = { name, status };
     const result = await this.rolesService.getRoleList(where, [], page, size);
 
     const { list, total } = result;
@@ -46,5 +45,55 @@ export class RoleController {
 
   @UseGuards(AuthGuard)
   @Post('edit')
-  async editRole(@Body() body) {}
+  async editRole(@Body() body: IEditRole) {
+    if (!body) {
+      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+    }
+
+    const { id, name, status } = body;
+
+    if (!id || !name) {
+      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+    }
+
+    const roleInfo = await this.rolesService.getRoleByName(name);
+
+    if (roleInfo && roleInfo.id !== id) {
+      throw new HttpException('角色已存在', HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      await this.rolesService.updateRole(body);
+      return '更新成功';
+    } catch (error) {
+      return new HttpException('更新失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('create')
+  async createRole(@Body() body: ICreateRole) {
+    if (!body) {
+      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+    }
+
+    const { name } = body;
+
+    if (!name) {
+      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
+    }
+
+    const roleInfo = await this.rolesService.getRoleByName(name);
+
+    if (roleInfo) {
+      throw new HttpException('角色已存在', HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      await this.rolesService.createRole(body);
+      return '创建成功';
+    } catch (error) {
+      return new HttpException('创建失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

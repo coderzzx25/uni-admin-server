@@ -1,15 +1,30 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
 
+export interface ICreateRole {
+  name: string;
+  code?: string;
+  describe?: string;
+  status: number;
+}
+
+export interface IEditRole {
+  id: number;
+  name: string;
+  code?: string;
+  describe?: string;
+  status: number;
+}
+
 @Entity('roles')
 export class Roles extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
-  @Column({ name: 'role_name', length: 20, default: '', comment: '角色名称' })
-  roleName: string;
+  @Column({ name: 'name', length: 20, default: '', comment: '角色名称' })
+  name: string;
 
-  @Column({ name: 'role_code', length: 20, default: '', comment: '角色编码' })
-  roleCode: string;
+  @Column({ name: 'code', length: 20, default: '', comment: '角色编码' })
+  code: string;
 
   @Column({ length: 200, default: '', comment: '角色描述' })
   describe: string;
