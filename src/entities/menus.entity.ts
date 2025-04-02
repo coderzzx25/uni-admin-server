@@ -1,5 +1,26 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
+export interface ICreateMenu {
+  menuType: string;
+  status: number;
+  parentId?: number;
+  permission?: string;
+  path?: string;
+  menuIcon?: string;
+  i18nName?: string;
+}
+
+export interface IEditMenu {
+  id: number;
+  menuType: string;
+  status: number;
+  parentId?: number;
+  permission?: string;
+  path?: string;
+  menuIcon?: string;
+  i18nName?: string;
+}
+
 @Entity('menus')
 export class Menus extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
