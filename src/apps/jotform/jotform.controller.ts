@@ -4,6 +4,6 @@ import { Controller, Post, Req } from '@nestjs/common';
 export class JotformController {
   @Post('webhook')
   async jotFormWebhook(@Req() req: any) {
-    console.log('jotFormWebhook', req.body);
+    console.log('jotFormWebhook', req);
   }
 }
