@@ -26,6 +26,7 @@
     "bcrypt": "^5.1.1",
     "ioredis": "^5.5.0",
     "mysql2": "^3.12.0",
+    "nestjs-form-data": "^1.9.93",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "socket.io": "^4.8.1",
