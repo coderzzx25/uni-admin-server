@@ -6,6 +6,6 @@ export class JotformController {
   @Post('webhook')
   @FormDataRequest()
   async jotFormWebhook(@Req() req: any) {
-    console.log('jotFormWebhook', req);
+    console.log('jotFormWebhook', req.body.pretty);
   }
 }
