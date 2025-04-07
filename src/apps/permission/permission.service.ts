@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ICreatePermission, ICreatePermissionService, Permissions } from 'src/entities/permissions.entity';
 import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { timestampToDate } from 'src/utils';
+import { getTimestamp, timestampToDate } from 'src/utils';
 
 @Injectable()
 export class PermissionService {
@@ -59,12 +59,15 @@ export class PermissionService {
   }
 
   async createPermission(data: ICreatePermissionService) {
-    const result = await this.permissionsRepository.save(data);
+    const createTime = getTimestamp();
+    const updateTime = createTime;
+    const result = await this.permissionsRepository.save({ ...data, createTime, updateTime });
     return result;
   }
 
   async updatePermission(id: number, data: ICreatePermissionService) {
-    const result = await this.permissionsRepository.update(id, data);
+    const updateTime = getTimestamp();
+    const result = await this.permissionsRepository.update(id, { ...data, updateTime });
     return result;
   }
 
