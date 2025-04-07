@@ -20,3 +20,22 @@ export class Permissions extends BaseEntity {
   @Column({ default: 0, comment: '状态:0:禁用, 1:启用' })
   status: number;
 }
+
+export interface IEditPermission {
+  id: number;
+  roleId: number;
+  menuId: number[];
+  status: number;
+}
+
+export interface ICreatePermission {
+  roleId: number;
+  menuId: number[];
+  status: number;
+}
+
+export interface ICreatePermissionService {
+  roleId: number;
+  menuId: string;
+  status: number;
+}

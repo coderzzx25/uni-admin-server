@@ -1,12 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Permissions } from 'src/entities/permissions.entity';
-import { FindManyOptions, FindOptionsWhere } from 'typeorm';
+import { ICreatePermission, ICreatePermissionService, Permissions } from 'src/entities/permissions.entity';
+import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { timestampToDate } from 'src/utils';
 
 @Injectable()
 export class PermissionService {
-  constructor(@InjectRepository(Permissions) private readonly permissionsRepository: typeof Permissions) {}
+  constructor(@InjectRepository(Permissions) private readonly permissionsRepository: Repository<Permissions>) {}
 
   async getPermissionList(
     where: FindOptionsWhere<Permissions>,
@@ -56,5 +56,25 @@ export class PermissionService {
       console.error('错误信息', error.message); // TODO: 记录错误日志
       return new HttpException('获取菜单ID失败', HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  async createPermission(data: ICreatePermissionService) {
+    const result = await this.permissionsRepository.save(data);
+    return result;
+  }
+
+  async updatePermission(id: number, data: ICreatePermissionService) {
+    const result = await this.permissionsRepository.update(id, data);
+    return result;
+  }
+
+  async getPermissionByRoleId(roleId: number) {
+    const result = await this.permissionsRepository.findOne({
+      where: {
+        roleId,
+      },
+    });
+
+    return result;
   }
 }
