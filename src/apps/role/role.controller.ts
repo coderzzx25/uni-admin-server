@@ -96,4 +96,10 @@ export class RoleController {
       return new HttpException('创建失败', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  @UseGuards(AuthGuard)
+  @Get('all')
+  async getAllRoles() {
+    return await this.rolesService.getAllRoles(['id', 'name']);
+  }
 }

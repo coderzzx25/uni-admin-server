@@ -19,7 +19,6 @@ export class PositionsService {
   async getPositionList(where: FindOptionsWhere<Positions>, fields: FindManyOptions<Positions>['select']) {
     const newWhere = {
       ...where,
-      id: Not(1),
     };
     const data = await this.positionsRepository.find({ where: newWhere, select: fields });
 

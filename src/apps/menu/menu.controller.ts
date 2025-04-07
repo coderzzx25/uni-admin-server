@@ -75,4 +75,10 @@ export class MenuController {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @UseGuards(AuthGuard)
+  @Get('all')
+  async getAllMenus() {
+    return this.menuService.getAllMenus(['id', 'i18nName', 'parentId', 'menuType']);
+  }
 }

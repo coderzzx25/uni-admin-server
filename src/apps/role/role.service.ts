@@ -21,7 +21,6 @@ export class RoleService {
 
     const newWhere = {
       ...where,
-      id: Not(1),
     };
     const [list, total] = await this.rolesRepository.findAndCount({
       where: newWhere,
@@ -60,5 +59,11 @@ export class RoleService {
     const updateTime = createTime;
 
     return await this.rolesRepository.save({ ...data, createTime, updateTime });
+  }
+
+  async getAllRoles(fields: FindManyOptions<Roles>['select']) {
+    return await this.rolesRepository.find({
+      select: fields,
+    });
   }
 }

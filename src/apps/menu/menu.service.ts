@@ -13,7 +13,6 @@ export class MenuService {
 
     const filterData = data.map((item) => ({
       ...item,
-      // name: item.parentId ? `${item.menuType}.${item.i18nName}` : item.i18nName,
       name: item.parentId
         ? item.menuType === 'button'
           ? item.i18nName
@@ -52,5 +51,23 @@ export class MenuService {
       console.error(error.message); // TODO: 记录错误日志
       return new HttpException('获取菜单失败', HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  async getAllMenus(fields: FindManyOptions<Menus>['select']) {
+    const data = await this.menusRepository.find({
+      select: fields,
+    });
+
+    const filterData = data.map((item) => ({
+      ...item,
+      parentId: item.parentId || undefined,
+      name: item.parentId
+        ? item.menuType === 'button'
+          ? item.i18nName
+          : `${item.menuType}.${item.i18nName}`
+        : item.i18nName,
+    }));
+
+    return filterData;
   }
 }
