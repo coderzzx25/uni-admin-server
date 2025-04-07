@@ -6,7 +6,8 @@ export class JotformController {
   @Post('webhook')
   @FormDataRequest()
   async jotFormWebhook(@Req() req: any) {
-    console.log('表单参数', req.body.pretty);
+    console.log('REQ', req);
+    console.log(req.body);
 
     const regex = /([^,:]+):([^,]*)(?:, |$)/g;
     const result = {};
