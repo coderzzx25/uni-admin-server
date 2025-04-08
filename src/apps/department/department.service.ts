@@ -8,7 +8,11 @@ import { FindManyOptions, FindOptionsWhere } from 'typeorm';
 export class DepartmentService {
   constructor(@InjectRepository(Department) private readonly departmentRepository: typeof Department) {}
 
-  async getDepartmentList(where: FindOptionsWhere<Department>, fields: FindManyOptions<Department>['select']) {
+  async getDepartmentList(
+    where: FindOptionsWhere<Department>,
+    fields: FindManyOptions<Department>['select'],
+    isTree = true,
+  ) {
     const data = await this.departmentRepository.find({ where, select: fields });
 
     const filterData = data.map((item) => ({
@@ -18,7 +22,7 @@ export class DepartmentService {
       updateTime: timestampToDate(item.updateTime),
     }));
 
-    const result = initializeTree(filterData, 'id', 'parentId', 'children');
+    const result = isTree ? initializeTree(filterData, 'id', 'parentId', 'children') : filterData;
 
     return result;
   }

@@ -8,13 +8,11 @@ import { ILoginResult, ILoginData } from './auth.interface';
 import { UserService } from '../user/user.service';
 import { MenuService } from '../menu/menu.service';
 import { PermissionService } from '../permission/permission.service';
-import { initializeTree } from 'src/utils';
+import { comparePassword, initializeTree } from 'src/utils';
 import { Menus } from 'src/entities/menus.entity';
 
 @Injectable()
 export class AuthService {
-  private readonly saltRounds = 10; // 加密强度
-
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
@@ -22,25 +20,6 @@ export class AuthService {
     private readonly permissionService: PermissionService,
     private readonly menuService: MenuService,
   ) {}
-
-  /**
-   * 密码加密
-   * @param password 密码
-   * @returns 加密后的密码
-   */
-  private async hashPassword(password: string): Promise<string> {
-    return await bcrypt.hash(password, this.saltRounds);
-  }
-
-  /**
-   * 密码比对
-   * @param plainText 明文密码
-   * @param encrypted 密文密码
-   * @returns 是否一致
-   */
-  private async comparePassword(plainText: string, encrypted: string): Promise<boolean> {
-    return await bcrypt.compare(plainText, encrypted);
-  }
 
   /**
    * 登录信息校验
@@ -70,7 +49,7 @@ export class AuthService {
     }
 
     // 密码校验
-    const isPasswordValid = await this.comparePassword(password, userInfo.password);
+    const isPasswordValid = comparePassword(password, userInfo.password);
 
     if (!isPasswordValid) {
       return new HttpException('密码错误', HttpStatus.BAD_REQUEST);

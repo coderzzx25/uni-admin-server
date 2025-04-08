@@ -1,5 +1,4 @@
-import { International } from 'src/entities/international.entity';
-
+import * as bcrypt from 'bcrypt';
 /**
  * 将数组转换为树形结构
  * @param resource 数据源
@@ -79,4 +78,23 @@ export const timestampToDate = (timestamp: number) => {
   const h = date.getHours();
   const m = date.getMinutes();
   return `${Y}-${M}-${D} ${h}:${m}`;
+};
+
+/**
+ *  比对密码
+ * @param plainText 明文
+ * @param encrypted 密文
+ * @returns 是否匹配
+ */
+export const comparePassword = (plainText: string, encrypted: string): boolean => {
+  return bcrypt.compareSync(plainText, encrypted);
+};
+
+/**
+ *  加密密码
+ * @param password 明文
+ * @returns 密文
+ */
+export const hashPassword = (password: string): string => {
+  return bcrypt.hashSync(password, 10);
 };

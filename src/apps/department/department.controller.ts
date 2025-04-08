@@ -14,9 +14,9 @@ export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
   @UseGuards(AuthGuard)
   @Get('list')
-  async getPositionList(@Query('name') name?: string, @Query('status') status?: number) {
+  async getPositionList(@Query('name') name?: string, @Query('status') status?: number, isTree?: boolean) {
     const where = { name, status };
-    const result = await this.departmentService.getDepartmentList(where, []);
+    const result = await this.departmentService.getDepartmentList(where, [], isTree);
     return result;
   }
 

@@ -16,7 +16,11 @@ export class PositionsService {
    * @param size 每页数量
    * @returns 职位列表
    */
-  async getPositionList(where: FindOptionsWhere<Positions>, fields: FindManyOptions<Positions>['select']) {
+  async getPositionList(
+    where: FindOptionsWhere<Positions>,
+    fields: FindManyOptions<Positions>['select'],
+    isTree = true,
+  ) {
     const newWhere = {
       ...where,
     };
@@ -29,7 +33,7 @@ export class PositionsService {
       updateTime: timestampToDate(item.updateTime),
     }));
 
-    const result = initializeTree(filterData, 'id', 'parentId', 'children');
+    const result = isTree ? initializeTree(filterData, 'id', 'parentId', 'children') : filterData;
 
     return result;
   }

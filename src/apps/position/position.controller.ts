@@ -17,9 +17,13 @@ export class PositionController {
    */
   @UseGuards(AuthGuard)
   @Get('list')
-  async getPositionList(@Query('name') name?: string, @Query('status') status?: number) {
+  async getPositionList(
+    @Query('name') name?: string,
+    @Query('status') status?: number,
+    @Query('isTree') isTree?: boolean,
+  ) {
     const where = { name, status };
-    const result = await this.positionsService.getPositionList(where, []);
+    const result = await this.positionsService.getPositionList(where, [], isTree);
 
     return result;
   }
