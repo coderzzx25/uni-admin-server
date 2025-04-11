@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ICreatePermission, ICreatePermissionService, Permissions } from 'src/entities/permissions.entity';
+import { ICreatePermissionService, Permissions } from 'src/entities/permissions.entity';
 import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { getTimestamp, timestampToDate } from 'src/utils';
 
@@ -8,12 +8,7 @@ import { getTimestamp, timestampToDate } from 'src/utils';
 export class PermissionService {
   constructor(@InjectRepository(Permissions) private readonly permissionsRepository: Repository<Permissions>) {}
 
-  async getPermissionList(
-    where: FindOptionsWhere<Permissions>,
-    fields: FindManyOptions<Permissions>['select'],
-    page = 1,
-    size = 10,
-  ) {
+  async getPermissionList(where: FindOptionsWhere<Permissions>, fields: FindManyOptions<Permissions>['select'], page = 1, size = 10) {
     const skip = (page - 1) * size;
 
     const newWhere = {
@@ -46,15 +41,18 @@ export class PermissionService {
    * @param roleId 角色id
    * @returns 菜单id列表
    */
-  async getMenuIdsByRoleId(roleId: number): Promise<HttpException | string> {
+  async getMenuIdsByRoleId(roleId: number): Promise<string | HttpException> {
     try {
-      const result = await this.permissionsRepository.query(
-        `SELECT menu_id FROM permissions WHERE FIND_IN_SET(role_id, ${roleId}) AND status = 1`,
-      );
-      return result.map((item: { menu_id: string }) => item.menu_id).join(',');
-    } catch (error) {
+      const result = await this.permissionsRepository.findOne({
+        where: {
+          roleId,
+        },
+      });
+      return result?.menuId || '';
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('An error occurred');
       console.error('错误信息', error.message); // TODO: 记录错误日志
-      return new HttpException('获取菜单ID失败', HttpStatus.INTERNAL_SERVER_ERROR);
+      return new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

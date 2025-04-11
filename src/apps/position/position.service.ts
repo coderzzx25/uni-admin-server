@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Positions } from 'src/entities/positions.entity';
 import { getTimestamp, initializeTree, timestampToDate } from 'src/utils';
-import { FindManyOptions, FindOptionsWhere, Not } from 'typeorm';
+import { FindManyOptions, FindOptionsWhere } from 'typeorm';
 
 @Injectable()
 export class PositionsService {
@@ -16,11 +16,7 @@ export class PositionsService {
    * @param size 每页数量
    * @returns 职位列表
    */
-  async getPositionList(
-    where: FindOptionsWhere<Positions>,
-    fields: FindManyOptions<Positions>['select'],
-    isTree = true,
-  ) {
+  async getPositionList(where: FindOptionsWhere<Positions>, fields: FindManyOptions<Positions>['select'], isTree = true) {
     const newWhere = {
       ...where,
     };

@@ -17,11 +17,7 @@ export class PositionController {
    */
   @UseGuards(AuthGuard)
   @Get('list')
-  async getPositionList(
-    @Query('name') name?: string,
-    @Query('status') status?: number,
-    @Query('isTree') isTree?: boolean,
-  ) {
+  async getPositionList(@Query('name') name?: string, @Query('status') status?: number, @Query('isTree') isTree?: boolean) {
     const where = { name, status };
     const result = await this.positionsService.getPositionList(where, [], isTree);
 
@@ -56,8 +52,9 @@ export class PositionController {
     try {
       await this.positionsService.updatePosition(id, { name, parentId, status });
       return 'SUCCESS_MESSAGE.UPDATE_SUCCESS';
-    } catch (error) {
-      return new HttpException('ERROR_MESSAGE.UPDATE_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      return new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -81,8 +78,9 @@ export class PositionController {
     try {
       await this.positionsService.createPosition({ name, status, parentId });
       return 'SUCCESS_MESSAGE.CREATE_SUCCESS';
-    } catch (error) {
-      throw new HttpException('SUCCESS_MESSAGE.CREATE_SUCCESS', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

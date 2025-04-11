@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ICreateRole, IEditRole, Roles } from 'src/entities/roles.entity';
 import { getTimestamp } from 'src/utils';
-import { FindManyOptions, FindOptionsWhere, Not, Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
 export class RoleService {

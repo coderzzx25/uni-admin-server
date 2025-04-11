@@ -6,47 +6,90 @@ import * as bcrypt from 'bcrypt';
  * @param parentId 父级ID
  * @param children 子级字段
  */
-export const initializeTree = <T>(resource: T[], id: string, parentId: string, children: string): T[] => {
-  const temp = JSON.parse(JSON.stringify(resource)); // 深拷贝
+export const initializeTree = <T extends object>(
+  resource: T[],
+  id: keyof T,
+  parentId: keyof T,
+  children: string,
+): (T & { [K in typeof children]: T[] })[] => {
+  // 定义增强类型
+  type TreeNode = T & { [K in typeof children]: T[] };
 
-  const tempObj: Record<string, T> = {};
+  // 安全类型转换
+  const temp: TreeNode[] = JSON.parse(JSON.stringify(resource)) as TreeNode[];
+  const tempObj: Record<string, TreeNode> = {};
 
-  for (const i in temp) {
-    tempObj[temp[i][id]] = temp[i];
+  // 预处理节点
+  for (const item of temp) {
+    const key = String(item[id]);
+    tempObj[key] = item;
+
+    // 类型安全写入 children
+    (item as unknown as Record<string, T[]>)[children] = [];
   }
 
-  return temp.filter((father: T) => {
-    const childArr = temp.filter((child: T) => father[id] === child[parentId]);
-    childArr.length && (father[children] = childArr);
-    return father[parentId] === 0 || !tempObj[father[parentId]];
-  });
+  // 构建树结构
+  const tree: TreeNode[] = [];
+  for (const item of temp) {
+    const parentKey = String(item[parentId]);
+
+    if (parentKey in tempObj) {
+      tempObj[parentKey][children as keyof T].push(item);
+    } else {
+      tree.push(item);
+    }
+  }
+
+  // 清理空 children
+  const cleanEmptyChildren = (nodes: TreeNode[]): TreeNode[] => {
+    return nodes.map((node) => {
+      const hasChildren = node[children as keyof T]?.length;
+      // 创建新对象避免修改原引用
+      const newNode = { ...node };
+
+      if (hasChildren) {
+        // 递归清理子节点
+        (newNode as Record<string, unknown>)[children] = cleanEmptyChildren(node[children as keyof T] as TreeNode[]);
+      } else {
+        // 删除空 children
+        delete (newNode as Record<string, unknown>)[children];
+      }
+
+      return newNode;
+    });
+  };
+
+  return cleanEmptyChildren(tree);
 };
 
 interface ResourceItem<T = any> {
   [key: string]: any;
   children?: T[];
 }
-export const initializeLang = <T extends ResourceItem>(
+export const initializeLang = <T extends ResourceItem, K extends Extract<keyof T, string>>(
   resource: T[],
-  lang: string,
-  name = 'name',
+  lang: K,
+  name: keyof T & string = 'name',
 ): Record<string, string> => {
-  const result = {};
+  const result: Record<string, string> = {};
 
-  for (let i = 0; i < resource.length; i++) {
-    const resourceItem = resource[i];
-
-    function recursive(item: T, key = '') {
+  for (const resourceItem of resource) {
+    function recursive(item: T, key = ''): void {
       let currentKey = key;
+      const itemName = item[name];
 
-      currentKey += currentKey ? `.${item[name]}` : item[name];
+      if (typeof itemName === 'string') {
+        currentKey += currentKey ? `.${itemName}` : itemName;
 
-      if (item[lang]) result[currentKey] = item[lang];
+        const langValue = item[lang];
+        if (typeof langValue === 'string') {
+          result[currentKey] = langValue;
+        }
 
-      if (item.children?.length && Array.isArray(item.children)) {
-        for (let j = 0; j < item.children.length; j++) {
-          const child = item.children[j];
-          recursive(child, currentKey);
+        if (Array.isArray(item.children)) {
+          for (const child of item.children as T[]) {
+            recursive(child, currentKey);
+          }
         }
       }
     }

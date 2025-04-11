@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
@@ -96,12 +95,21 @@ export class AuthService {
    * @param token token
    * @returns 是否有效
    */
-  async validateTokenService(token: string): Promise<ILoginResult | null> {
+  validateTokenService(token: string) {
     try {
-      const result = this.jwtService.verify(token, { secret: this.configService.get('JWT_SECRET') });
+      const result = this.jwtService.verify<ILoginResult>(token, {
+        secret: this.configService.get('JWT_SECRET'),
+      });
+
+      // 确保返回值符合 ILoginResult 类型
+      if (!result || typeof result !== 'object' || !('id' in result)) {
+        throw new Error('Invalid token payload');
+      }
+
       return result;
-    } catch (e) {
-      return null;
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      return new HttpException(error, HttpStatus.UNAUTHORIZED);
     }
   }
 

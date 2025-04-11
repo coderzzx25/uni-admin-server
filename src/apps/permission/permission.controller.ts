@@ -45,8 +45,9 @@ export class PermissionController {
     try {
       await this.permissionService.createPermission({ ...body, menuId: menuList });
       return '创建成功';
-    } catch (error) {
-      return new HttpException('创建失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('An error occurred');
+      return new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -73,8 +74,9 @@ export class PermissionController {
     try {
       await this.permissionService.updatePermission(id, { ...body, menuId: menuList });
       return '更新成功';
-    } catch (error) {
-      return new HttpException('更新失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('An error occurred');
+      return new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

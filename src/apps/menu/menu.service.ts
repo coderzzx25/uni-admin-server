@@ -13,11 +13,7 @@ export class MenuService {
 
     const filterData = data.map((item) => ({
       ...item,
-      name: item.parentId
-        ? item.menuType === 'button'
-          ? item.i18nName
-          : `${item.menuType}.${item.i18nName}`
-        : item.i18nName,
+      name: item.parentId ? (item.menuType === 'button' ? item.i18nName : `${item.menuType}.${item.i18nName}`) : item.i18nName,
       parentId: item.parentId || undefined,
       createTime: timestampToDate(item.createTime),
       updateTime: timestampToDate(item.updateTime),
@@ -47,9 +43,9 @@ export class MenuService {
         order: { sort: 'DESC' },
       });
       return result;
-    } catch (error) {
-      console.error(error.message); // TODO: 记录错误日志
-      return new HttpException('获取菜单失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('An error occurred');
+      return new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -61,11 +57,7 @@ export class MenuService {
     const filterData = data.map((item) => ({
       ...item,
       parentId: item.parentId || undefined,
-      name: item.parentId
-        ? item.menuType === 'button'
-          ? item.i18nName
-          : `${item.menuType}.${item.i18nName}`
-        : item.i18nName,
+      name: item.parentId ? (item.menuType === 'button' ? item.i18nName : `${item.menuType}.${item.i18nName}`) : item.i18nName,
     }));
 
     return filterData;

@@ -50,7 +50,7 @@ export class RoleController {
       throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
     }
 
-    const { id, name, status } = body;
+    const { id, name } = body;
 
     if (!id || !name) {
       throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
@@ -65,8 +65,9 @@ export class RoleController {
     try {
       await this.rolesService.updateRole(body);
       return '更新成功';
-    } catch (error) {
-      return new HttpException('更新失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      return new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -92,8 +93,9 @@ export class RoleController {
     try {
       await this.rolesService.createRole(body);
       return '创建成功';
-    } catch (error) {
-      return new HttpException('创建失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      return new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

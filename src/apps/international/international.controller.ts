@@ -1,7 +1,6 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
-import { InternationalService } from './international.service';
-import { International } from 'src/entities/international.entity';
+import { IAllLocal, InternationalService } from './international.service';
 import { ICanActivate } from '../auth/auth.interface';
 import { getTimestamp } from 'src/utils';
 import { Like } from 'typeorm';
@@ -15,7 +14,7 @@ export class InternationalController {
    * @returns 语言数据
    */
   @Get('lang')
-  async getAllLocalsLang() {
+  async getAllLocalsLang(): Promise<IAllLocal> {
     const result = await this.internationalService.getAllLocalsLang();
     return result;
   }
@@ -70,8 +69,9 @@ export class InternationalController {
       const dates = { ...data, founder: user.id, createTime: getTimestamp(), updateTime: getTimestamp() };
       await this.internationalService.createInternational(dates);
       return '创建成功';
-    } catch (error) {
-      throw new HttpException('创建失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -80,9 +80,7 @@ export class InternationalController {
    */
   @UseGuards(AuthGuard)
   @Post('edit')
-  async editInternational(
-    @Body() data: { id: number; name: string; status: number; parentId?: number; enUS?: string; zhCN?: string },
-  ) {
+  async editInternational(@Body() data: { id: number; name: string; status: number; parentId?: number; enUS?: string; zhCN?: string }) {
     if (!data) {
       throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
     }
@@ -108,8 +106,9 @@ export class InternationalController {
       const dates = { ...data, updateTime: getTimestamp() };
       await this.internationalService.updateInternational(id, dates);
       return '编辑成功';
-    } catch (error) {
-      throw new HttpException('编辑失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

@@ -66,4 +66,6 @@ export class Menus extends BaseEntity {
 
   @Column('int', { name: 'update_time', comment: '更新时间', default: () => 'UNIX_TIMESTAMP()' })
   updateTime: number;
+
+  children?: Menus[];
 }

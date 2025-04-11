@@ -29,6 +29,11 @@ interface IUpdateInternational {
   parentId?: number;
 }
 
+export interface IAllLocal {
+  zhCN: Record<string, unknown>;
+  enUS: Record<string, unknown>;
+}
+
 @Injectable()
 export class InternationalService {
   constructor(
@@ -36,14 +41,14 @@ export class InternationalService {
     @Inject('REDIS_CLIENT') private readonly redis: Redis,
   ) {}
 
-  async getAllLocalsLang() {
-    const LANGS = ['zhCN', 'enUS']; // TODO:后续优化
-    const result = {};
+  async getAllLocalsLang(): Promise<IAllLocal> {
+    const LANGS = ['zhCN', 'enUS'] as const;
+    const result: Partial<IAllLocal> = {};
 
     const redisLocales = await this.redis.get(RedisKey.LOCALES);
 
     if (redisLocales) {
-      return JSON.parse(redisLocales);
+      return JSON.parse(redisLocales) as IAllLocal;
     }
 
     const sqlData = await this.internationalRepository.find();
@@ -59,7 +64,7 @@ export class InternationalService {
     // 将数据缓存到redis中
     await this.redis.set(RedisKey.LOCALES, JSON.stringify(result));
 
-    return result;
+    return result as IAllLocal;
   }
 
   async getInternationalList(where: FindOptionsWhere<International>, fields: FindManyOptions<International>['select']) {

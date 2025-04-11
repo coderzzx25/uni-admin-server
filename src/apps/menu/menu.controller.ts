@@ -41,8 +41,9 @@ export class MenuController {
     try {
       await this.menuService.createMenu(body);
       return '创建成功';
-    } catch (error) {
-      throw new HttpException('创建失败', HttpStatus.BAD_REQUEST);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -71,7 +72,8 @@ export class MenuController {
     try {
       await this.menuService.updateMenu(body);
       return '修改成功';
-    } catch (error) {
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }

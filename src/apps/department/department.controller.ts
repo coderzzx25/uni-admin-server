@@ -43,8 +43,9 @@ export class DepartmentController {
     try {
       await this.departmentService.createDepartment({ name, status, parentId });
       return '创建成功';
-    } catch (error) {
-      throw new HttpException('创建失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -74,8 +75,9 @@ export class DepartmentController {
     try {
       await this.departmentService.updateDepartment(id, { name, parentId, status });
       return '更新成功';
-    } catch (error) {
-      return new HttpException('更新失败', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      return new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
