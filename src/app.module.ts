@@ -14,7 +14,6 @@ import { ChatModule } from './apps/chat/chat.module';
 import { PositionModule } from './apps/position/position.module';
 import { InternationalModule } from './apps/international/international.module';
 import { DepartmentModule } from './apps/department/department.module';
-import { JotformModule } from './apps/jotform/jotform.module';
 import redisModule from './libs/redis.config';
 
 @Module({
@@ -30,7 +29,6 @@ import redisModule from './libs/redis.config';
     PositionModule,
     InternationalModule,
     DepartmentModule,
-    JotformModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatGateway, redisModule],
