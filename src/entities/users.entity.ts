@@ -47,9 +47,9 @@ export class Users extends BaseEntity {
   @Column('int', { name: 'role_id', comment: '角色id' })
   roleId: number;
 
-  @Column({ name: 'create_time', default: 0, comment: '创建时间' })
-  createTime: number;
+  // @Column({ name: 'create_time', default: 0, comment: '创建时间' })
+  // createTime: number;
 
-  @Column({ name: 'update_time', default: 0, comment: '更新时间' })
-  updateTime: number;
+  // @Column({ name: 'update_time', default: 0, comment: '更新时间' })
+  // updateTime: number;
 }
