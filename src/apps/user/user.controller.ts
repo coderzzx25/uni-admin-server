@@ -55,8 +55,6 @@ export class UserController {
       'positionId',
       'departmentId',
       'roleId',
-      'createTime',
-      'updateTime',
     ];
     const result = await this.userService.getUserList(where, fields, page, size);
     return result;
