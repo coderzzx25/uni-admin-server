@@ -1,9 +1,18 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
 
+export interface IRoleDto {
+  name: string;
+  code?: string;
+  describe?: string;
+  menuId: string;
+  status: number;
+}
+
 export interface ICreateRole {
   name: string;
   code?: string;
   describe?: string;
+  menuId: number[];
   status: number;
 }
 
@@ -12,6 +21,7 @@ export interface IEditRole {
   name: string;
   code?: string;
   describe?: string;
+  menuId: number[];
   status: number;
 }
 
@@ -28,6 +38,9 @@ export class Roles extends BaseEntity {
 
   @Column({ length: 200, default: '', comment: '角色描述' })
   describe: string;
+
+  @Column({ name: 'menu_id', type: 'varchar', length: '200', default: '', comment: '菜单ID' })
+  menuId: string;
 
   @Column({ default: 0, comment: '排序' })
   sort: number;

@@ -6,9 +6,9 @@ import { Users } from 'src/entities/users.entity';
 import { ILoginResult, ILoginData } from './auth.interface';
 import { UserService } from '../user/user.service';
 import { MenuService } from '../menu/menu.service';
-import { PermissionService } from '../permission/permission.service';
 import { comparePassword, initializeTree } from 'src/utils';
 import { Menus } from 'src/entities/menus.entity';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +16,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-    private readonly permissionService: PermissionService,
+    private readonly roleService: RoleService,
     private readonly menuService: MenuService,
   ) {}
 
@@ -157,24 +157,15 @@ export class AuthService {
    * @throws HttpException
    */
   async getUserMenuService(roleId: number): Promise<HttpException | Menus[]> {
-    // 获取角色对应的菜单id
-    const menuIdList = await this.permissionService.getMenuIdsByRoleId(roleId);
+    const menuIdList = await this.roleService.getMenuIdsByRoleId(roleId);
 
-    if (menuIdList instanceof HttpException) {
-      throw menuIdList;
-    }
+    if (!menuIdList) return [];
 
-    if (!menuIdList.length) return [];
-
-    // 根据菜单ID获取菜单列表
-    const menuList = await this.menuService.getMenuListById(menuIdList);
-
+    const menuList = await this.menuService.getMenuListById(menuIdList.menuId);
     if (menuList instanceof HttpException) {
       throw menuList;
     }
-
     if (!menuList.length) return [];
-
     return initializeTree(menuList, 'id', 'parentId', 'children');
   }
 }

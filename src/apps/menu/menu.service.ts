@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ICreateMenu, IEditMenu, Menus } from 'src/entities/menus.entity';
+import { IEditMenu, IMenuDto, Menus } from 'src/entities/menus.entity';
 import { getTimestamp, initializeTree, timestampToDate } from 'src/utils';
 import { FindManyOptions, FindOptionsWhere, In, Repository } from 'typeorm';
 
@@ -24,15 +24,15 @@ export class MenuService {
     return result;
   }
 
-  async createMenu(data: ICreateMenu) {
+  async createMenu(data: IMenuDto) {
     const createTime = getTimestamp();
     const updateTime = createTime;
     return await this.menusRepository.save({ ...data, createTime, updateTime });
   }
 
-  async updateMenu(data: IEditMenu) {
+  async updateMenu(id: number, data: IEditMenu) {
     const updateTime = getTimestamp();
-    const result = await this.menusRepository.update(data.id, { ...data, updateTime });
+    const result = await this.menusRepository.update(id, { ...data, updateTime });
     return result;
   }
 

@@ -8,7 +8,6 @@ import { AuthModule } from './apps/auth/auth.module';
 import { UserModule } from './apps/user/user.module';
 import { MenuModule } from './apps/menu/menu.module';
 import { RoleModule } from './apps/role/role.module';
-import { PermissionModule } from './apps/permission/permission.module';
 import { ChatGateway } from './apps/chat/chat.gateway';
 import { ChatModule } from './apps/chat/chat.module';
 import { PositionModule } from './apps/position/position.module';
@@ -24,7 +23,6 @@ import redisModule from './libs/redis.config';
     UserModule,
     MenuModule,
     RoleModule,
-    PermissionModule,
     ChatModule,
     PositionModule,
     InternationalModule,

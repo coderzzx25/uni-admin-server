@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ICreateRole, IEditRole, Roles } from 'src/entities/roles.entity';
+import { IRoleDto, Roles } from 'src/entities/roles.entity';
 import { getTimestamp } from 'src/utils';
 import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 
@@ -38,9 +38,9 @@ export class RoleService {
     };
   }
 
-  async updateRole(data: IEditRole) {
+  async updateRole(id: number, data: IRoleDto) {
     const updateTime = getTimestamp();
-    const result = await this.rolesRepository.update(data.id, { ...data, updateTime });
+    const result = await this.rolesRepository.update(id, { ...data, updateTime });
     return result;
   }
 
@@ -54,7 +54,7 @@ export class RoleService {
     return result;
   }
 
-  async createRole(data: ICreateRole) {
+  async createRole(data: IRoleDto) {
     const createTime = getTimestamp();
     const updateTime = createTime;
 
@@ -64,6 +64,15 @@ export class RoleService {
   async getAllRoles(fields: FindManyOptions<Roles>['select']) {
     return await this.rolesRepository.find({
       select: fields,
+    });
+  }
+
+  async getMenuIdsByRoleId(id: number) {
+    return await this.rolesRepository.findOne({
+      where: {
+        id,
+      },
+      select: ['menuId'],
     });
   }
 }

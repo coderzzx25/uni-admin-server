@@ -5,7 +5,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
 import { MenuModule } from '../menu/menu.module';
-import { PermissionModule } from '../permission/permission.module';
+import { RoleModule } from '../role/role.module';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { PermissionModule } from '../permission/permission.module';
       },
     }),
     UserModule,
-    PermissionModule,
+    RoleModule,
     MenuModule,
   ],
   controllers: [AuthController],

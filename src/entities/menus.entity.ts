@@ -1,5 +1,15 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
+export interface IMenuDto {
+  menuType: string;
+  status: number;
+  parentId?: number;
+  permission?: string;
+  path?: string;
+  menuIcon?: string;
+  i18nName?: string;
+}
+
 export interface ICreateMenu {
   menuType: string;
   status: number;

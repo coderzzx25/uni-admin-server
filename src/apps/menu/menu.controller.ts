@@ -70,7 +70,7 @@ export class MenuController {
     }
 
     try {
-      await this.menuService.updateMenu(body);
+      await this.menuService.updateMenu(id, body);
       return '修改成功';
     } catch (e: unknown) {
       const error = e instanceof Error ? e : new Error('Unknown error');

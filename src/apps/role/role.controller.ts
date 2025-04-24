@@ -26,7 +26,7 @@ export class RoleController {
     @Query('status') status?: number,
   ) {
     if (!page || !size) {
-      throw new HttpException('ERROR_MESSAGE.INVALID_PARAMETER', HttpStatus.BAD_REQUEST);
+      throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
     }
 
     const where = { name, status };
@@ -36,6 +36,7 @@ export class RoleController {
 
     const lists = list.map((item: Roles) => ({
       ...item,
+      menuId: item.menuId.split(',').map((item) => Number(item)),
       createTime: timestampToDate(item.createTime),
       updateTime: timestampToDate(item.updateTime),
     }));
@@ -62,8 +63,12 @@ export class RoleController {
       throw new HttpException('角色已存在', HttpStatus.BAD_REQUEST);
     }
 
+    const data = {
+      ...body,
+      menuId: body.menuId.join(','),
+    };
     try {
-      await this.rolesService.updateRole(body);
+      await this.rolesService.updateRole(id, data);
       return '更新成功';
     } catch (e: unknown) {
       const error = e instanceof Error ? e : new Error('Unknown error');
@@ -90,8 +95,12 @@ export class RoleController {
       throw new HttpException('角色已存在', HttpStatus.BAD_REQUEST);
     }
 
+    const data = {
+      ...body,
+      menuId: body.menuId.join(','),
+    };
     try {
-      await this.rolesService.createRole(body);
+      await this.rolesService.createRole(data);
       return '创建成功';
     } catch (e: unknown) {
       const error = e instanceof Error ? e : new Error('Unknown error');
