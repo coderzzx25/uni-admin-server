@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, Req } from '@nestjs/common';
 
 interface IInquiryData {
   No_Label_name: string;
@@ -17,6 +17,7 @@ export class TestController {
    * 西语询盘
    */
   @Post('inquiry')
+  @HttpCode(200)
   inquiry(@Body() body: any, @Req() req: any) {
     console.log(body, req);
     return 'ok';
